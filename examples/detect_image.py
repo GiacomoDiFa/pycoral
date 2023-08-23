@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#ciao
 r"""Example using PyCoral to detect objects in a given image.
 
 To run this code, you must attach an Edge TPU attached to the host and
