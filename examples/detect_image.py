@@ -77,33 +77,26 @@ def main():
   image_list = []
   scale_list = []
   objs_list = []
-
+  
   for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/*.jpg'):
     im = Image.open(filename)
-    image_list.append(im)
-  print(image_list)
-
-  for i in range(len(image_list)):
-    _, scale = common.set_resized_input(interpreter, image_list[i].size, lambda size: image_list[i].resize(size, Image.ANTIALIAS))
-    scale_list.append(scale)
-  print(scale_list)
-
-
-  print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
-  for var in range(len(scale_list)):
+    interpreter = make_interpreter(args.model)
+    interpreter.allocate_tensors()
+    _, scale = common.set_resized_input(interpreter, im.size, lambda size: im.resize(size, Image.ANTIALIAS))
+    
     print('----INFERENCE TIME----')
-    inference_result = []
+    inference_results = []
     for _ in range(args.count):
-      start = time.perf_counter()
-      interpreter.invoke()
-      inference_time = time.perf_counter() - start
-      print('%.2f ms' % (inference_time * 1000))
-    objs = detect.get_objects(interpreter, args.threshold, scale_list[var])
-    inference_result.append(objs)
-    objs_list.append(inference_result)
-
+        start = time.perf_counter()
+        interpreter.invoke()
+        inference_time = time.perf_counter() - start
+        print('%.2f ms' % (inference_time * 1000))
+        
+        objs = detect.get_objects(interpreter, args.threshold, scale)
+        inference_results.append(objs)
+    
+    objs_list.append(inference_results)
   print(objs_list)
-
   print('-------RESULTS--------')
 
   for i in range(len(objs_list)):
