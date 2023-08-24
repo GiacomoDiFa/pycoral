@@ -85,7 +85,6 @@ def main():
     _, scale = common.set_resized_input(interpreter, im.size, lambda size: im.resize(size, Image.ANTIALIAS))
     
     print('----INFERENCE TIME----')
-    inference_results = []
     for _ in range(args.count):
         start = time.perf_counter()
         interpreter.invoke()
@@ -94,29 +93,20 @@ def main():
         
         
     objs = detect.get_objects(interpreter, args.threshold, scale)
-    inference_results.append(objs)
-    objs_list.append(inference_results)
-  print(objs_list)
+    objs_list.append(objs)
+  #print(objs_list)
   print('-------RESULTS--------')
 
   for i in range(len(objs_list)):
-    if not i:
-      print('No objects detected')
-    for j in range(len(objs_list[i])):
-      print(labels.get(objs_list[i][j].id, objs_list[i][j].id))
-      print('  id:    ', objs_list[i][j].id)
-      print('  score: ', objs_list[i][j].score)
-      print('  bbox:  ', objs_list[i][j].bbox)
-
-
-  #if not objs:
-  #  print('No objects detected')
-
-  #for obj in objs:
-  #  print(labels.get(obj.id, obj.id))
-   # print('  id:    ', obj.id)
-    #print('  score: ', obj.score)
-    #print('  bbox:  ', obj.bbox)
+    if not objs_list[i]:
+      print('No objects detected in image: ', i)
+    else:
+      print('Objects detected in image', i)
+      for j in range(len(objs_list[i])):
+        print(labels.get(objs_list[i][j].id, objs_list[i][j].id))
+        print('  id:    ', objs_list[i][j].id)
+        print('  score: ', objs_list[i][j].score)
+        print('  bbox:  ', objs_list[i][j].bbox)
 
   if args.output:
     image = image.convert('RGB')
