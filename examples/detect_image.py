@@ -83,34 +83,24 @@ def main():
     image_list.append(im)
   print(image_list)
 
-  #image = Image.open(args.input)
   for i in range(len(image_list)):
     _, scale = common.set_resized_input(interpreter, image_list[i].size, lambda size: image_list[i].resize(size, Image.ANTIALIAS))
     scale_list.append(scale)
   print(scale_list)
-  #_, scale = common.set_resized_input(
-  #    interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
 
-  #print('----INFERENCE TIME----')
-  #print('Note: The first inference is slow because it includes',
-   #     'loading the model into Edge TPU memory.')
-  #for _ in range(args.count):
-   # start = time.perf_counter()
-    #interpreter.invoke()
-    #inference_time = time.perf_counter() - start
-    #objs = detect.get_objects(interpreter, args.threshold, scale)
-    #print('%.2f ms' % (inference_time * 1000))
 
   print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
   for var in range(len(scale_list)):
     print('----INFERENCE TIME----')
+    inference_result = []
     for _ in range(args.count):
       start = time.perf_counter()
       interpreter.invoke()
       inference_time = time.perf_counter() - start
       print('%.2f ms' % (inference_time * 1000))
     objs = detect.get_objects(interpreter, args.threshold, scale_list[var])
-    objs_list.append(objs)
+    inference_result.append(objs)
+    objs_list.append(inference_result)
 
   print(objs_list)
 
