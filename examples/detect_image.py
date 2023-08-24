@@ -92,9 +92,9 @@ def main():
         inference_time = time.perf_counter() - start
         print('%.2f ms' % (inference_time * 1000))
         
-        objs = detect.get_objects(interpreter, args.threshold, scale)
-        inference_results.append(objs)
-    
+        
+    objs = detect.get_objects(interpreter, args.threshold, scale)
+    inference_results.append(objs)
     objs_list.append(inference_results)
   print(objs_list)
   print('-------RESULTS--------')
