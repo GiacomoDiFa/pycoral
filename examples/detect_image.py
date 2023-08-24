@@ -102,15 +102,15 @@ def main():
     #print('%.2f ms' % (inference_time * 1000))
 
   print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
-  for scale in range(len(scale_list)):
+  for var in range(len(scale_list)):
     print('----INFERENCE TIME----')
     for _ in range(args.count):
       start = time.perf_counter()
       interpreter.invoke()
       inference_time = time.perf_counter() - start
-      objs = detect.get_objects(interpreter, args.threshold, scale_list[scale])
-      objs_list.append(objs)
+      objs = detect.get_objects(interpreter, args.threshold, scale_list[var])
       print('%.2f ms' % (inference_time * 1000))
+    objs_list.append(objs)
 
   print(objs_list)
 
