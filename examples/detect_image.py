@@ -78,14 +78,14 @@ def main():
   scale_list = []
   objs_list = []
 
-  for filename in glob.glob('assets\original_images\*.jpg'):
+  for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/*.jpg'):
     im = Image.open(filename)
     image_list.append(im)
   print(image_list)
 
   #image = Image.open(args.input)
   for i in range(len(image_list)):
-    _, scale = common.set_resized_input(interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
+    _, scale = common.set_resized_input(interpreter, image_list[i].size, lambda size: image_list[i].resize(size, Image.ANTIALIAS))
     scale_list.append(scale)
   print(scale_list)
   #_, scale = common.set_resized_input(
@@ -100,29 +100,40 @@ def main():
     #inference_time = time.perf_counter() - start
     #objs = detect.get_objects(interpreter, args.threshold, scale)
     #print('%.2f ms' % (inference_time * 1000))
-  
+
+  print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
   for scale in range(len(scale_list)):
     print('----INFERENCE TIME----')
-    print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
     for _ in range(args.count):
       start = time.perf_counter()
       interpreter.invoke()
       inference_time = time.perf_counter() - start
-      objs = detect.get_objects(interpreter, args.threshold, scale)
+      objs = detect.get_objects(interpreter, args.threshold, scale_list[scale])
       objs_list.append(objs)
       print('%.2f ms' % (inference_time * 1000))
 
   print(objs_list)
 
   print('-------RESULTS--------')
-  if not objs:
-    print('No objects detected')
 
-  for obj in objs:
-    print(labels.get(obj.id, obj.id))
-    print('  id:    ', obj.id)
-    print('  score: ', obj.score)
-    print('  bbox:  ', obj.bbox)
+  for i in range(len(objs_list)):
+    if not i:
+      print('No objects detected')
+    for j in range(len(objs_list[i])):
+      print(labels.get(objs_list[i][j].id, objs_list[i][j].id))
+      print('  id:    ', objs_list[i][j].id)
+      print('  score: ', objs_list[i][j].score)
+      print('  bbox:  ', objs_list[i][j].bbox)
+
+
+  #if not objs:
+  #  print('No objects detected')
+
+  #for obj in objs:
+  #  print(labels.get(obj.id, obj.id))
+   # print('  id:    ', obj.id)
+    #print('  score: ', obj.score)
+    #print('  bbox:  ', obj.bbox)
 
   if args.output:
     image = image.convert('RGB')
