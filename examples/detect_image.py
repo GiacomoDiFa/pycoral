@@ -59,7 +59,7 @@ def main():
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument('-m', '--model', required=True,
                       help='File path of .tflite file')
-  parser.add_argument('-i', '--input', required=True,
+  parser.add_argument('-i', '--input',
                       help='File path of image to process')
   parser.add_argument('-l', '--labels', help='File path of labels file')
   parser.add_argument('-t', '--threshold', type=float, default=0.4,
@@ -81,12 +81,13 @@ def main():
   for filename in glob.glob('assets\original_images\*.jpg'):
     im = Image.open(filename)
     image_list.append(im)
+  print(image_list)
 
   #image = Image.open(args.input)
   for i in range(len(image_list)):
     _, scale = common.set_resized_input(interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
     scale_list.append(scale)
-    
+  print(scale_list)
   #_, scale = common.set_resized_input(
   #    interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
 
