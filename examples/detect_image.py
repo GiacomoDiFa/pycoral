@@ -108,8 +108,8 @@ def main():
       start = time.perf_counter()
       interpreter.invoke()
       inference_time = time.perf_counter() - start
-      objs = detect.get_objects(interpreter, args.threshold, scale_list[var])
       print('%.2f ms' % (inference_time * 1000))
+    objs = detect.get_objects(interpreter, args.threshold, scale_list[var])
     objs_list.append(objs)
 
   print(objs_list)
