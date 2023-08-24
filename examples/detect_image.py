@@ -32,6 +32,7 @@ python3 examples/detect_image.py \
 
 import argparse
 import time
+import glob
 
 from PIL import Image
 from PIL import ImageDraw
@@ -73,19 +74,44 @@ def main():
   interpreter = make_interpreter(args.model)
   interpreter.allocate_tensors()
 
-  image = Image.open(args.input)
-  _, scale = common.set_resized_input(
-      interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
+  image_list = []
+  scale_list = []
+  objs_list = []
 
-  print('----INFERENCE TIME----')
-  print('Note: The first inference is slow because it includes',
-        'loading the model into Edge TPU memory.')
-  for _ in range(args.count):
-    start = time.perf_counter()
-    interpreter.invoke()
-    inference_time = time.perf_counter() - start
-    objs = detect.get_objects(interpreter, args.threshold, scale)
-    print('%.2f ms' % (inference_time * 1000))
+  for filename in glob.glob('assets\original_images\*.jpg'):
+    im = Image.open(filename)
+    image_list.append(im)
+
+  #image = Image.open(args.input)
+  for i in range(len(image_list)):
+    _, scale = common.set_resized_input(interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
+    scale_list.append(scale)
+    
+  #_, scale = common.set_resized_input(
+  #    interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
+
+  #print('----INFERENCE TIME----')
+  #print('Note: The first inference is slow because it includes',
+   #     'loading the model into Edge TPU memory.')
+  #for _ in range(args.count):
+   # start = time.perf_counter()
+    #interpreter.invoke()
+    #inference_time = time.perf_counter() - start
+    #objs = detect.get_objects(interpreter, args.threshold, scale)
+    #print('%.2f ms' % (inference_time * 1000))
+  
+  for scale in range(len(scale_list)):
+    print('----INFERENCE TIME----')
+    print('Note: The first inference is slow because it includes','loading the model into Edge TPU memory.')
+    for _ in range(args.count):
+      start = time.perf_counter()
+      interpreter.invoke()
+      inference_time = time.perf_counter() - start
+      objs = detect.get_objects(interpreter, args.threshold, scale)
+      objs_list.append(objs)
+      print('%.2f ms' % (inference_time * 1000))
+
+  print(objs_list)
 
   print('-------RESULTS--------')
   if not objs:
