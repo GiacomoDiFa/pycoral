@@ -33,6 +33,7 @@ python3 examples/detect_image.py \
 import argparse
 import time
 import glob
+import json
 
 from PIL import Image
 from PIL import ImageDraw
@@ -41,6 +42,28 @@ from pycoral.adapters import common
 from pycoral.adapters import detect
 from pycoral.utils.dataset import read_label_file
 from pycoral.utils.edgetpu import make_interpreter
+
+from collections import defaultdict
+
+# Carica il file JSON
+with open('/home/mendel/research_coral/pycoral/assets/labels/annotations.json', 'r') as file:
+    data = json.load(file)
+
+# Crea un dizionario in cui archiviare il conteggio dei category_id
+category_count = defaultdict(int)
+
+# Itera attraverso le voci nel file JSON e conta i category_id
+for entry in data:
+    segments_info = entry['segments_info']
+    for segment_info in segments_info:
+        category_id = segment_info['category_id']
+        category_count[category_id] += 1
+
+sorted_category_count = dict(sorted(category_count.items(), key=lambda item: item[0]))
+
+# Stampa i risultati
+for category_id, count in sorted_category_count.items():
+    print(f"Di category_id {category_id} ne ho trovati {count}")
 
 
 def draw_objects(draw, objs, labels):
@@ -78,7 +101,7 @@ def main():
   scale_list = []
   objs_list = []
   
-  for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/*.jpg'):
+  for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/dataset/640x480/jpeg15/*.jpg'):
     im = Image.open(filename)
     interpreter = make_interpreter(args.model)
     interpreter.allocate_tensors()
