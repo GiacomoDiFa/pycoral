@@ -65,6 +65,17 @@ sorted_category_count = dict(sorted(category_count.items(), key=lambda item: ite
 for category_id, count in sorted_category_count.items():
     print(f"Di category_id {category_id} ne ho trovati {count}")
 
+def count_y_pred(y_pred):
+  conteggio = {}
+  for numero in y_pred:
+    if numero in conteggio:
+      conteggio[numero] += 1
+    else:
+      conteggio[numero] = 1
+  return conteggio
+
+  
+
 
 def draw_objects(draw, objs, labels):
   """Draws the bounding box and label for each object."""
@@ -100,8 +111,9 @@ def main():
   image_list = []
   scale_list = []
   objs_list = []
-  
-  for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/dataset/640x480/jpeg15/*.jpg'):
+  y_pred = []
+
+  for filename in glob.glob('/home/mendel/research_coral/pycoral/assets/original_images/*.jpg'):
     im = Image.open(filename)
     interpreter = make_interpreter(args.model)
     interpreter.allocate_tensors()
@@ -128,9 +140,18 @@ def main():
       for j in range(len(objs_list[i])):
         print(labels.get(objs_list[i][j].id, objs_list[i][j].id))
         print('  id:    ', objs_list[i][j].id)
+        y_pred.append(objs_list[i][j].id)
         print('  score: ', objs_list[i][j].score)
         print('  bbox:  ', objs_list[i][j].bbox)
-
+  y_pred.sort()
+  conteggio_y_pred = count_y_pred(y_pred)
+  print(conteggio_y_pred)
+  print(sorted_category_count)
+  for key in sorted_category_count:
+    if key not in conteggio_y_pred:
+      conteggio_y_pred[key] = 0
+  conteggio_y_pred_sorted = dict(sorted(conteggio_y_pred.items(), key=lambda item: item[0]))
+  print(conteggio_y_pred_sorted)
   if args.output:
     image = image.convert('RGB')
     draw_objects(ImageDraw.Draw(image), objs, labels)
